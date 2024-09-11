@@ -1,0 +1,43 @@
+.images-show {
+    height: 91vh;
+    position: relative;
+    margin: auto;
+}
+
+.image-1, .image-2, .image-3 {
+    display: none;
+}
+
+.img {
+    width: 90%;
+    height: 100%;
+    position: absolute;
+    left: 5%;
+}
+
+.next, .prev {
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: bold;
+    background-color: rgb(176, 175, 170);
+    color: black;
+    padding: 15px;
+}
+
+.next:hover, .prev:hover{
+    background-color: black;
+    color: white;
+}
+
+.next{
+    position: absolute;
+    top: 50%;
+    right: 0;
+}
+
+.prev {
+    position: absolute;
+    top: 50%;
+    left: 0;
+}
