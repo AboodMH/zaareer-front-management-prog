@@ -22,12 +22,14 @@ export default function Input(){
     const [inputs, setInputs] = useState([]);
     const [data, setData] = useState({});
     const [searchInputs, setSearchInputs] = useState([]);
-    const [month, setMonth] = useState('');
     const [editDescriptionIsOpen, setEditDescriptionIsOpen] = useState([false,{}]);
     const [description,setDescription] = useState('');
 
-    const handleSubmit=(event)=>{
-        event.preventDefault();
+
+    let month=localStorage.getItem('month');
+
+
+    const handleSubmit=(e)=>{
         const formData = new FormData();
         formData.append('_method', 'GET');
         formData.append('month',month);
@@ -58,7 +60,7 @@ export default function Input(){
     }
 
     useEffect(() => {
-        fetchThisInput();
+        handleSubmit();
       }, []);
 
     return(
@@ -68,7 +70,7 @@ export default function Input(){
             <Link to="/input/create" className='btn btn-outline-success'>{t("create")}</Link>
                 <form onSubmit={handleSubmit} className='d-flex'>
                     <input type="submit" value={t("show")} className="btn btn-light border px-4 py-1"/>
-                    <input className='mx-2 form-control' onChange={(e)=>{setMonth(e.target.value);}} type='month'/>
+                    <input className='mx-2 form-control' value={month} onChange={(e)=>{localStorage.setItem('month',e.target.value);}} type='month'/>
                     <input className='form-control' placeholder={t("invoice no")} onChange={(e)=>{filterTheData('invoice_no',e.target.value.toLowerCase(),data,setInputs,searchInputs);}} type='text'/>
                 </form>
             </div>

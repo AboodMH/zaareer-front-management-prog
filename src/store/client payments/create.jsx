@@ -57,7 +57,8 @@ export default function PaymentCreate(){
                 <div className="form-group mb-4">
                     <label className="form-label" htmlFor="date">{t('date')}</label>
                     <input onChange={(e)=>{setDate(e.target.value)}} type="date" className="form-control" placeholder={t("Enter date")}/>
-
+                </div>
+                <div className="form-group mb-4">
                     <label for="client name">{t("client name")}</label>
                     <select onChange={(e)=>{setClientName(e.target.value)}} type="text" className="form-select" placeholder={t("Enter client name")}>
                         <option value="">select client name</option>
@@ -74,10 +75,14 @@ export default function PaymentCreate(){
                 </div>
                 <div className="form-group mb-4">
                     <label for="description">{t("description")}</label>
-                    <input onChange={(e)=>{setDescription(e.target.value)}} type="text" className="form-control" placeholder={t("Enter description")}/>
+                    <select onChange={(e)=>{setDescription(e.target.value)}} className="form-select" id="description">
+                        <option value="">{t("choose description")}</option>
+                        <option value="دائن">{t("creditor")}</option>
+                        <option value="مدين">{t("debtor")}</option>
+                    </select>
                 </div>
                <div className="form-group mb-4">
-                    <label for="method">{t("method")}</label>
+                    <label for="method">{t("payment method")}</label>
                     <input onChange={(e)=>{setMethod(e.target.value)}} type="text" className="form-control" placeholder={t("Enter method")}/>
                 </div>
                 <div className=" d-flex justify-content-start"> 

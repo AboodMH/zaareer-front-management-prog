@@ -16,6 +16,7 @@ export default function InputDetailsEdit(){
 
     const { i18n, t } = useTranslation();
     const navigate = useNavigate();
+    const [productData, setProductData] = useState({});
     const [date, setDate] = useState(`${inputData.month}-${inputData.day}`);
     const [companyName, setCompanyName] = useState(inputData.company_name);
     const [productNo, setProductNo] = useState(inputData.product_no);
@@ -26,9 +27,8 @@ export default function InputDetailsEdit(){
     const [packing, setPacking] = useState(inputData.packing);
     const [description, setDescription] = useState(inputData.description);
     const [image, setImage] = useState("");
-    const [sellPrice,setSellPrice] = useState(0);
+    const [sellPrice,setSellPrice] = useState();
     const [totalInputData, setTotalInputData] = useState([]);
-    const [productData, setProductData] = useState([]);
     const [editSellPriceIsOpen,setEditSellPriceIsOpen] = useState(false);
 
     const fetchTotalInput = async () => {
@@ -39,8 +39,9 @@ export default function InputDetailsEdit(){
 
     const fetchProduct=async(productNo)=>{
         await axios.get(`http://127.0.0.1:8000/api/store/product/${productNo}`,config).then(({data})=>{
-            setProductData(data[0]);
-            console.log(data);
+            setProductData(data);
+            setSellPrice(data.sell_price);
+            console.log(data.sell_price);
         });
     }
 
@@ -120,13 +121,12 @@ function editSellPrice(t,navigate,totalInputData,inputData,productData,editSellP
         formDataTotalInput.append('date', date);
         formDataTotalInput.append('company_name',companyName);
         formDataTotalInput.append('invoice_no',invoiceNo);
-        formDataTotalInput.append('description',totalInputData[0].description);
-        formDataTotalInput.append('value',(totalInputData[0].value-((inputData.price*inputData.cartoon*inputData.packing)-(price*cartoon*packing))).toFixed(2));
-        formDataTotalInput.append('quantity',totalInputData[0].quantity-(inputData.cartoon-cartoon));
-        await axios.post(`http://127.0.0.1:8000/api/store/totalInput/${totalInputData[0].id}`, formDataTotalInput,config)
+        formDataTotalInput.append('description',totalInputData.description);
+        formDataTotalInput.append('value',(totalInputData.value-((inputData.price*inputData.cartoon*inputData.packing)-(price*cartoon*packing))).toFixed(2));
+        formDataTotalInput.append('quantity',totalInputData.quantity-(inputData.cartoon-cartoon));
+        await axios.post(`http://127.0.0.1:8000/api/store/totalInput/${totalInputData.id}`, formDataTotalInput,config)
         .then(({data})=>{
             console.log(data.message);
-            navigate(-1);
         }).catch(({response})=>{
             if (response.status ==422) {
                 console.log(response.data.errors)
@@ -185,16 +185,18 @@ function editSellPrice(t,navigate,totalInputData,inputData,productData,editSellP
 
         console.log(formDataProduct)
         
-        await axios.post(`http://127.0.0.1:8000/api/store/product/${productData.id}`, formDataProduct,config)
-        .then(({data})=>{
-            console.log(data.message);
-        }).catch(({response})=>{
-            if (response.status ==422) {
-                console.log(response.data.errors)
-            } else {
-                console.log(response.data.message)
-            }
-        });
+        if (productData) {
+            await axios.post(`http://127.0.0.1:8000/api/store/product/${productData.id}`, formDataProduct,config)
+            .then(({data})=>{
+                console.log(data.message);
+            }).catch(({response})=>{
+                if (response.status ==422) {
+                    console.log(response.data.errors)
+                } else {
+                    console.log(response.data.message)
+                }
+            });
+        }
     }
 
     return(

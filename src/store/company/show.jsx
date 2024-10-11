@@ -77,6 +77,7 @@ function companyDataTable(companyData,total,t){
                             <th>{t("company name")}</th>
                             <th>{t("company address")}</th>
                             <th>{t("phone")}</th>
+                            <th>{t("discount")}</th>
                             <th>{t("amount")}</th>
                             <th>{t("edit")}</th>
                         </tr>
@@ -87,6 +88,7 @@ function companyDataTable(companyData,total,t){
                             <td>{companyData.company_name}</td>
                             <td>{companyData.company_address}</td>
                             <td>{companyData.company_phone}</td>
+                            <td>{companyData.discount}</td>
                             <td>{total.toFixed(2)}</td>
                             <td><Link to="/company/edit" state={{ data: companyData }} type="button" class="btn btn-success" style={{height: "auto"}}>{t("edit")}</Link></td>
                         </tr>

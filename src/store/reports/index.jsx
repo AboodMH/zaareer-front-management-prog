@@ -66,7 +66,7 @@ export default function Report(){
                 <div style={{display:"flex",justifyContent:"space-between",padding:"10px"}}>
                     <form onSubmit={handleSubmit}>
                         <input type="submit" value={t("show")} class="btn btn-light border mx-2 px-4 py-1"/>
-                        <input onChange={(e)=>{setYear(e.target.value);}} type='text' value={year}/>
+                        <input className='form-control' onChange={(e)=>{setYear(e.target.value);}} type='text' value={year}/>
                     </form>
                 </div>
             </div>
@@ -76,11 +76,8 @@ export default function Report(){
                         <tr>
                             <th>{t("month")}</th>
                             <th>{t("inputs")}</th>
-                            <th>{t("inputs quantity")}</th>
                             <th>{t("outputs")}</th>
-                            <th>{t("outputs quantity")}</th>
-                            <th>{t("net quantity")}</th>
-                            <th>{t("net products")}</th>
+                            <th>{t("difference")}</th>
                             <th>{t("expenses")}</th>
                             <th>{t("water")}</th>
                             <th>{t("electric")}</th>
@@ -100,11 +97,8 @@ export default function Report(){
                                     <tr key={index}>
                                         <td>{item.month}</td>
                                         <td>{item.inputs}</td>
-                                        <td>{item.inputsQuantity}</td>
                                         <td>{item.outputs}</td>
-                                        <td>{item.outputsQuantity}</td>
-                                        <td>{item.inputsQuantity-item.outputsQuantity}</td>
-                                        <td>{item.inputs-item.outputs}</td>
+                                        <td>{(item.inputs-item.outputs).toFixed(2)}</td>
                                         <td>{item.expenses}</td>
                                         <td>{item.water}</td>
                                         <td>{item.electric}</td>
@@ -114,7 +108,7 @@ export default function Report(){
                                         <td>{item.salaries}</td>
                                         <td>{item.companiesPayments}</td>
                                         <td>{item.clientsPayments}</td>
-                                        <td>{item.clientsPayments-item.expenses-item.salaries-item.companiesPayments}</td>
+                                        <td>{(item.clientsPayments-item.expenses-item.salaries-item.companiesPayments).toFixed(2)}</td>
                                     </tr>
                                 );
                             })
@@ -124,11 +118,7 @@ export default function Report(){
                         <tr>
                             <td>{tableYear}</td>
                             <td>{fullReportArray.fullInputs}</td>
-                            <td>{fullReportArray.fullInputsQuantity}</td>
                             <td>{fullReportArray.fullOutputs}</td>
-                            <td>{fullReportArray.fullOutputsQuantity}</td>
-                            <td>{fullReportArray.fullInputsQuantity-fullReportArray.fullOutputsQuantity}</td>
-                            <td>{fullReportArray.fullInputs-fullReportArray.fullOutputs}</td>
                             <td>{fullReportArray.fullExpenses}</td>
                             <td>{fullReportArray.fullWater}</td>
                             <td>{fullReportArray.fullElectric}</td>
@@ -138,7 +128,7 @@ export default function Report(){
                             <td>{fullReportArray.fullSalaries}</td>
                             <td>{fullReportArray.fullCompaniesPayments}</td>
                             <td>{fullReportArray.fullClientsPayments}</td>
-                            <td>{fullReportArray.fullClientsPayments-fullReportArray.fullExpenses-fullReportArray.fullSalaries-fullReportArray.fullCompaniesPayments}</td>
+                            <td>{(fullReportArray.fullClientsPayments-fullReportArray.fullExpenses-fullReportArray.fullSalaries-fullReportArray.fullCompaniesPayments).toFixed(2)}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -236,19 +226,19 @@ function reportData(year,data){
 
         reportArray[i]={
             month: `${year}-${i<10 ? `0${i}` : i}`,
-            inputs: inputs,
+            inputs: inputs.toFixed(2),
             inputsQuantity: inputsQuantity,
-            outputs: outputs,
+            outputs: outputs.toFixed(2),
             outputsQuantity: outputsQuantity,
-            expenses: expenses,
-            water: water,
-            electric: electric,
-            rent: rent,
-            internet: internet,
-            localExpenses: localExpenses,
-            salaries: salaries,
-            companiesPayments: companiesPayments,
-            clientsPayments: clientsPayments,
+            expenses: expenses.toFixed(2),
+            water: water.toFixed(2),
+            electric: electric.toFixed(2),
+            rent: rent.toFixed(2),
+            internet: internet.toFixed(2),
+            localExpenses: localExpenses.toFixed(2),
+            salaries: salaries.toFixed(2),
+            companiesPayments: companiesPayments.toFixed(2),
+            clientsPayments: clientsPayments.toFixed(2),
         };
         inputs=0;
         inputsQuantity=0;
@@ -266,19 +256,19 @@ function reportData(year,data){
 
     }
     fullReportArray={
-        "fullInputs": fullInputs,
+        "fullInputs": fullInputs.toFixed(2),
         "fullInputsQuantity": fullInputsQuantity,
-        "fullOutputs": fullOutputs,
+        "fullOutputs": fullOutputs.toFixed(2),
         "fullOutputsQuantity": fullOutputsQuantity,
-        "fullExpenses": fullExpenses,
-        "fullWater": fullWater,
-        "fullElectric": fullElectric,
-        "fullRent": fullRent,
-        "fullInternet": fullInternet,
-        "fullLocalExpenses": fullLocalExpenses,
-        "fullSalaries": fullSalaries,
-        "fullCompaniesPayments": fullCompaniesPayments,
-        "fullClientsPayments": fullClientsPayments,
+        "fullExpenses": fullExpenses.toFixed(2),
+        "fullWater": fullWater.toFixed(2),
+        "fullElectric": fullElectric.toFixed(2),
+        "fullRent": fullRent.toFixed(2),
+        "fullInternet": fullInternet.toFixed(2),
+        "fullLocalExpenses": fullLocalExpenses.toFixed(2),
+        "fullSalaries": fullSalaries.toFixed(2),
+        "fullCompaniesPayments": fullCompaniesPayments.toFixed(2),
+        "fullClientsPayments": fullClientsPayments.toFixed(2),
         
     }
 }

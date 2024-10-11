@@ -14,9 +14,16 @@ export default function Client(){
     const { i18n, t } = useTranslation();
     const navigate=useNavigate();
     const [staff, setStaff] = useState([]);
+    const [data, setData] = useState({});
+    const [fullStaff, setFullStaff] = useState([]);
+
 
     const fetchStaff = async () => {
-        await axios.get('http://127.0.0.1:8000/api/store/client',config).then(({ data }) => {setStaff(data);});
+        await axios.get('http://127.0.0.1:8000/api/store/client',config).then(({ data }) => {
+            setStaff(data);
+            setData(data);
+            setFullStaff(data);
+        });
     }
     useEffect(() => {
         fetchStaff();
@@ -26,6 +33,10 @@ export default function Client(){
         <div className='p-2'>  
             <div class="d-flex justify-content-between mb-2" style={{alignItems:"center"}}>
                 <Link to="/client/create" className='btn btn-outline-success'>{t("create")}</Link>
+                <form className='d-flex'>
+                    <input className='form-control' placeholder={t("client name")} onChange={(e)=>{filterTheData('client_name',e.target.value,data,setStaff,fullStaff)}} type='text'/>
+                    <input className='form-control mx-2' placeholder={t("id")} onChange={(e)=>{filterTheData('client_id',e.target.value,data,setStaff,fullStaff)}} type='text'/>
+                </form>
             </div>
             <div className="row row-cols-auto center">
                 {staff.map((item,index)=>{
@@ -56,3 +67,14 @@ export default function Client(){
     );
 }
 
+function filterTheData(searchType,value,data,setStaff,fullStaff){
+    let result=data.filter(check);
+    function check(element){
+        return element[searchType].toLowerCase().startsWith(value);
+    }
+    if (value) {
+        setStaff(result);
+    }else{
+        setStaff(fullStaff);
+    }
+}

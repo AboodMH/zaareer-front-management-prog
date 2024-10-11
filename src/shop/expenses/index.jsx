@@ -228,7 +228,7 @@ function editExpense(shopName,dateExpense,setDateExpense,editExpenseIsOpen, setE
                                 <option value="">{t("description")}</option>
                                 <option value="ماء">{t("water")}</option>
                                 <option value="كهرياء">{t("electric")}</option>
-                                <option value="الاجار">{t("rent")}</option>
+                                <option value="اجار">{t("rent")}</option>
                                 <option value="انترنت">{t("internet")}</option>
                             </select>
                         </div>

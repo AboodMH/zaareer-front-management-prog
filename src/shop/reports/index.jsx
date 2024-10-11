@@ -175,8 +175,8 @@ function reportData(year,totalInputs,totalSells,totalExpenses){
             if(item.month===`${year}-${i<10 ? `0${i}` : i}`){
                 sells+=item.total_sell;
                 fullSells+=item.total_sell;
-                netSells=item.amount_in_box;
-                fullNetSells=item.amount_in_box;
+                netSells+=item.amount_in_box;
+                fullNetSells+=item.amount_in_box;
                 expenses+=item.total_expense;
                 fullExpenses+=item.total_expense;
                 salaries+=item.total_withdrawl;

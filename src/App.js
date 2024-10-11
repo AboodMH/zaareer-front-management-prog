@@ -23,8 +23,9 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import StoreIcon from '@mui/icons-material/Store';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import Login from './auth/login.js';
-import Home from './home/index.js';
+import Home from './home/index.jsx';
 import Modal from 'react-modal';
 import { LANGUAGES } from './constants/language.js';
 import CreateInput from './store/inputs/create.jsx';
@@ -60,10 +61,8 @@ import CompanyPayment from './store/company-payments/index.jsx';
 import CompanyPaymentCreate from './store/company-payments/create.jsx';
 import CompanyPaymentEdit from './store/company-payments/edit.jsx';
 import ShopExpense from './shop/expenses/index.jsx';
-import CreateShopInput from './shop/inputs/create.jsx';
 import ShopInput from './shop/inputs/index.jsx';
 import ShopInputDetails from './shop/inputs/details.jsx';
-import ShopInputDetailsEdit from './shop/inputs/editDetails.jsx';
 import ShopInputDetailsImage from './shop/inputs/image.jsx';
 import ShopWithdrawl from './shop/withdrawls/index.jsx';
 import ShopStaff from './shop/staff/index.jsx';
@@ -72,6 +71,9 @@ import ShopEditEmployee from './shop/staff/edit.jsx';
 import ShopDetailStaff from './shop/staff/show.jsx';
 import ShopReport from './shop/reports/index.jsx';
 import ShopSells from './shop/sells/index.jsx';
+import ProductOutputs from './store/product-outputs/index.jsx';
+import ProductOutputsDetails from './store/product-outputs/details.jsx';
+import ProductOutputsImage from './store/product-outputs/image.jsx';
 
 
 let isAuth=localStorage.getItem('isAuth');
@@ -116,13 +118,15 @@ export default function App() {
               <Sidebar id='sidebar' rootStyles={{backgroundColor:"rgb(180, 180, 170)",height:"100vh",position:"sticky",top:"0",}}>
                 {
                   <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+                    <img  alt="logo" style={{width:"150px",}}/>
                   </div>
-                  }
+                }
                 <Menu>
                   <MenuItem style={{padding:"0"}} icon={<HomeIcon/>} component={<Link to="/"/>}>{t("main")}</MenuItem>
                   <SubMenu style={{padding:"0"}} icon={<StorefrontIcon/>} label={t("store")} >
                     <MenuItem style={{padding:"0"}} icon={<InputIcon/>} component={<Link to="/inputs"/>}>{t("inputs")}</MenuItem>
                     <MenuItem style={{padding:"0"}} icon={<OutputIcon/>} component={<Link to="/outputs"/>}>{t("outputs")}</MenuItem>
+                    <MenuItem style={{padding:"0"}} icon={<ListAltIcon/>} component={<Link to="/ProductOutputs"/>}>{t("product outputs")}</MenuItem>
                     <MenuItem style={{padding:"0"}} icon={<MoneyIcon/>} component={<Link to="/expenses"/>}>{t("expenses")}</MenuItem>
                     <MenuItem style={{padding:"0"}} icon={<AttachMoneyIcon/>} component={<Link to="/withdrawls"/>}>{t("withdrawls")}</MenuItem>
                     <MenuItem style={{padding:"0"}} icon={<PaymentIcon/>} component={<Link to="/client/payments"/>}>{t("clients payments")}</MenuItem>
@@ -135,7 +139,7 @@ export default function App() {
 
                   </SubMenu>
                   <SubMenu style={{padding:"0"}} icon={<StoreIcon/>} label={t("shop 1")} >
-                    <MenuItem style={{padding:"0"}} icon={<SellIcon/>} component={<Link to="/shop/shafa/sells"/>}>{t("sells")}</MenuItem>
+                    <MenuItem style={{padding:"0"}} icon={<SellIcon/>}  component={<Link to="/shop/shafa/sells"/>}>{t("sells")}</MenuItem>
                     <MenuItem style={{padding:"0"}} icon={<InputIcon/>} component={<Link to="/shop/shafa/inputs"/>}>{t("inputs")}</MenuItem>
                     <MenuItem style={{padding:"0"}} icon={<MoneyIcon/>} component={<Link to="/shop/shafa/expenses"/>}>{t("expenses")}</MenuItem>
                     <MenuItem style={{padding:"0"}} icon={<AttachMoneyIcon/>} component={<Link to="/shop/shafa/withdrawls"/>}>{t("withdrawls")}</MenuItem>
@@ -197,6 +201,9 @@ export default function App() {
                   <Route path="/output/create" element={isAuth ? <CreateOutput/> : <Login/>}/>
                   <Route path="/output/details/edit" element={isAuth ? <OutputDetailsEdit/> : <Login/>}/>
                   <Route path="/output/details/image" element={isAuth ? <OutputImage/> : <Login/>}/>
+                  <Route path="/productOutputs" element={isAuth ? <ProductOutputs/> : <Login/>}/>
+                  <Route path="/productOutputs/details" element={isAuth ? <ProductOutputsDetails/> : <Login/>}/>
+                  <Route path="/productOutputs/image" element={isAuth ? <ProductOutputsImage/> : <Login/>}/>
                   <Route path="/expenses" element={isAuth ? <Expense/> : <Login/>}/>
                   <Route path="/withdrawls" element={isAuth ? <Withdrawl/> : <Login/>}/>
                   <Route path="/clients" element={isAuth ? <Client/> : <Login/>}/>
@@ -223,9 +230,7 @@ export default function App() {
                    // shafa shop
                   <Route path="/shop/shafa/sells" element={isAuth ? <ShopSells shopName="shafa"/> : <Login/>}/>
                   <Route path='/shop/shafa/inputs' element={isAuth ? <ShopInput shopName="shafa"/> :<Login/>}/>
-                  <Route path='/shop/shafa/input/create' element={isAuth ? <CreateShopInput shopName="shafa"/> : <Login/>}/>
                   <Route path='/shop/shafa/input/details' element={isAuth ? <ShopInputDetails shopName="shafa"/> : <Login/>}/>
-                  <Route path='/shop/shafa/input/details/edit' element={isAuth ? <ShopInputDetailsEdit shopName="shafa"/> : <Login/>}/>
                   <Route path='/shop/shafa/input/details/image' element={isAuth ? <ShopInputDetailsImage shopName="shafa"/> : <Login/>}/>
                   <Route path='/shop/shafa/expenses' element={isAuth ? <ShopExpense shopName="shafa"/> : <Login/>}/>
                   <Route path='/shop/shafa/withdrawls' element={isAuth ? <ShopWithdrawl shopName="shafa"/> : <Login/>}/>
@@ -239,9 +244,7 @@ export default function App() {
                   // rsifah shop
                   <Route path="/shop/rsifah/sells" element={isAuth ? <ShopSells shopName="rsifah"/> : <Login/>}/>
                   <Route path='/shop/rsifah/inputs' element={isAuth ? <ShopInput shopName="rsifah"/> :<Login/>}/>
-                  <Route path='/shop/rsifah/input/create' element={isAuth ? <CreateShopInput shopName="rsifah"/> : <Login/>}/>
                   <Route path='/shop/rsifah/input/details' element={isAuth ? <ShopInputDetails shopName="rsifah"/> : <Login/>}/>
-                  <Route path='/shop/rsifah/input/details/edit' element={isAuth ? <ShopInputDetailsEdit shopName="rsifah"/> : <Login/>}/>
                   <Route path='/shop/rsifah/input/details/image' element={isAuth ? <ShopInputDetailsImage shopName="rsifah"/> : <Login/>}/>
                   <Route path='/shop/rsifah/expenses' element={isAuth ? <ShopExpense shopName="rsifah"/> : <Login/>}/>
                   <Route path='/shop/rsifah/withdrawls' element={isAuth ? <ShopWithdrawl shopName="rsifah"/> : <Login/>}/>
@@ -255,9 +258,7 @@ export default function App() {
                   // berain shop
                   <Route path="/shop/berain/sells" element={isAuth ? <ShopSells shopName="berain"/> : <Login/>}/>
                   <Route path='/shop/berain/inputs' element={isAuth ? <ShopInput shopName="berain"/> :<Login/>}/>
-                  <Route path='/shop/berain/input/create' element={isAuth ? <CreateShopInput shopName="berain"/> : <Login/>}/>
                   <Route path='/shop/berain/input/details' element={isAuth ? <ShopInputDetails shopName="berain"/> : <Login/>}/>
-                  <Route path='/shop/berain/input/details/edit' element={isAuth ? <ShopInputDetailsEdit shopName="berain"/> : <Login/>}/>
                   <Route path='/shop/berain/input/details/image' element={isAuth ? <ShopInputDetailsImage shopName="berain"/> : <Login/>}/>
                   <Route path='/shop/berain/expenses' element={isAuth ? <ShopExpense shopName="berain"/> : <Login/>}/>
                   <Route path='/shop/berain/withdrawls' element={isAuth ? <ShopWithdrawl shopName="berain"/> : <Login/>}/>
@@ -271,9 +272,7 @@ export default function App() {
                   // sahab shop
                   <Route path="/shop/sahab/sells" element={isAuth ? <ShopSells shopName="sahab"/> : <Login/>}/>
                   <Route path='/shop/sahab/inputs' element={isAuth ? <ShopInput shopName="sahab"/> :<Login/>}/>
-                  <Route path='/shop/sahab/input/create' element={isAuth ? <CreateShopInput shopName="sahab"/> : <Login/>}/>
                   <Route path='/shop/sahab/input/details' element={isAuth ? <ShopInputDetails shopName="sahab"/> : <Login/>}/>
-                  <Route path='/shop/sahab/input/details/edit' element={isAuth ? <ShopInputDetailsEdit shopName="sahab"/> : <Login/>}/>
                   <Route path='/shop/sahab/input/details/image' element={isAuth ? <ShopInputDetailsImage shopName="sahab"/> : <Login/>}/>
                   <Route path='/shop/sahab/expenses' element={isAuth ? <ShopExpense shopName="sahab"/> : <Login/>}/>
                   <Route path='/shop/sahab/withdrawls' element={isAuth ? <ShopWithdrawl shopName="sahab"/> : <Login/>}/>

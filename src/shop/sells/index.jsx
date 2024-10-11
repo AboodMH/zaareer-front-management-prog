@@ -12,6 +12,13 @@ const config = {
 };
 
 let totalValue=0;
+let fullCash=0;
+let fullCard=0;
+let fullExpenses=0;
+let fullWithdrawls=0;
+let fullAmountInBox=0;
+let fullDeference=0;
+
 
 export default function ShopSells({shopName}){
     const date=new Date();
@@ -29,7 +36,6 @@ export default function ShopSells({shopName}){
     const [amountInBox, setAmountInBox] = useState('');
     const [editId, setEditId] = useState('');
 
-
     const handleSubmit=(event)=>{
         event.preventDefault();
         const formData = new FormData();
@@ -39,15 +45,43 @@ export default function ShopSells({shopName}){
         .then(response => {
             setThisMonth(month);
             setSells(response.data);
+            fullCash=0;
+            fullCard=0;
+            fullExpenses=0;
+            fullWithdrawls=0;
+            fullAmountInBox=0;
+            fullDeference=0;
+            (response.data).map((item,index)=>{
+                fullCash+=item.sell_cash;
+                fullCard+=item.sell_card;
+                fullExpenses+=item.total_expense;
+                fullWithdrawls+=item.total_withdrawl;
+                fullAmountInBox+=item.amount_in_box;
+                fullDeference+=item.difference_in_box;
+            });
         })
     }
-    const fetchThisExpense = async () => {
+    const fetchThisSells = async () => {
         await axios.get(`http://127.0.0.1:8000/api/shop/${shopName}/sell`,config).then(({ data }) => {
             setSells(data);
+            fullCash=0;
+            fullCard=0;
+            fullExpenses=0;
+            fullWithdrawls=0;
+            fullAmountInBox=0;
+            fullDeference=0;
+            data.map((item,index)=>{
+                fullCash+=item.sell_cash;
+                fullCard+=item.sell_card;
+                fullExpenses+=item.total_expense;
+                fullWithdrawls+=item.total_withdrawl;
+                fullAmountInBox+=item.amount_in_box;
+                fullDeference+=item.difference_in_box;
+            });
         });
     }
     useEffect(() => {
-        fetchThisExpense();
+        fetchThisSells();
       }, []);
 
     return(
@@ -68,12 +102,14 @@ export default function ShopSells({shopName}){
                             <th>{t("date")}</th>
                             <th>{t("sell cash")}</th>
                             <th>{t("sell card")}</th>
-                            <th>{t("total sells")}</th>
                             <th>{t("total expense")}</th>
                             <th>{t("total withdrawl")}</th>
                             <th>{t("final total")}</th>
                             <th>{t("amount in box")}</th>
                             <th>{t("difference in box")}</th>
+                            <th>{t("total sales")}</th>
+                            <th>{t("total paid")}</th>
+                            <th>{t("total net sales")}</th>
                             <th>{t("edit")}</th>
                         </tr>
                     </thead>
@@ -85,12 +121,14 @@ export default function ShopSells({shopName}){
                                         <td>{item.month}-{item.day}</td>
                                         <td>{item.sell_cash}</td>
                                         <td>{item.sell_card}</td>
-                                        <td>{item.total_sell}</td>
                                         <td>{item.total_expense}</td>
                                         <td>{item.total_withdrawl}</td>
                                         <td>{item.final_total}</td>
                                         <td>{item.amount_in_box}</td>
                                         <td>{item.difference_in_box}</td>
+                                        <td>{item.total_sell+item.difference_in_box}</td>
+                                        <td>{item.total_withdrawl+item.total_expense}</td>
+                                        <td>{item.sell_card+item.amount_in_box}</td>
                                         <td><button className='btn btn-success' onClick={()=>{setEditSellsIsOpen(true);setEditId(item.id);setSellsDate(`${item.month}-${item.day}`);setSellCash(item.sell_cash);setSellCard(item.sell_card);setTotalExpense(item.total_expense);setTotalWithdrawl(item.total_withdrawl);setAmountInBox(item.amount_in_box)}}>{t('edit')}</button></td>
                                     </tr>
                                 );
@@ -98,7 +136,20 @@ export default function ShopSells({shopName}){
                         }
                     </tbody>
                     <tfoot>
-                        
+                        <tr>
+                            <th>Total</th>
+                            <th>{fullCash}</th>
+                            <th>{fullCard}</th>
+                            <th>{fullExpenses}</th>
+                            <th>{fullWithdrawls}</th>
+                            <th>{fullCash-fullExpenses-fullWithdrawls}</th>
+                            <th>{fullAmountInBox}</th>
+                            <th>{fullDeference}</th>
+                            <th>{fullCash+fullCard+fullDeference}</th>
+                            <th>{fullExpenses+fullWithdrawls}</th>
+                            <th>{fullCard+fullAmountInBox}</th>
+                            <th></th>
+                        </tr>
                     </tfoot>
                 </table>
             </div>

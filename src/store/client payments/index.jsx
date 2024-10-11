@@ -18,10 +18,12 @@ export default function Payment() {
     const { i18n, t } = useTranslation();
     const navigate=useNavigate();
     const [payments, setPayments] = useState([]);
-    const [month, setMonth] = useState("");
 
-    const handleSubmit=(event)=>{
-        event.preventDefault();
+
+    let month=localStorage.getItem('month');
+
+
+    const handleSubmit=(e)=>{
         const formData = new FormData();
         formData.append('_method', 'GET');
         formData.append('month',month);
@@ -46,16 +48,17 @@ export default function Payment() {
         });
     }
     useEffect(() => {
-        fetchClient();
+        //fetchClient();
+        handleSubmit();
       }, []);
 
     return(
         <div className='p-2'>
             <div class="d-flex justify-content-between mb-2" style={{alignItems:"center"}}>
             <Link to="/client/payment/create" className='btn btn-outline-success'>{t("create")}</Link>
-            <form onSubmit={handleSubmit}>
+            <form className='d-flex' onSubmit={handleSubmit}>
                 <input type="submit" value={t("show")} class="btn btn-light border mx-2 px-4 py-1"/>
-                <input onChange={(e)=>{setMonth(e.target.value);}} type='month'/>
+                <input className='form-control' onChange={(e)=>{localStorage.setItem('month',e.target.value);}} value={month} type='month'/>
             </form>
             </div>
             <div class="table-responsive">

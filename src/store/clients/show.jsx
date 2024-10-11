@@ -44,7 +44,7 @@ export default function ClientDetails(){
         .then(response => {
             setOutput(response.data['output']);
             setPayment(response.data['payment']);
-            setTotal(response.data['total']);
+            setTotal((response.data['total']).toFixed(2));
             setMonth(response.data['month']);
             client(response.data['output'],response.data['payment'],clientData,response.data['month']);
         })
@@ -53,7 +53,7 @@ export default function ClientDetails(){
         await axios.get(`http://127.0.0.1:8000/api/store/client/${clientData.client_id}`,config).then(({ data }) => {
             setOutput(data['output']);
             setPayment(data['payment']);
-            setTotal(data['total']);
+            setTotal(data['total'].toFixed(2));
             setMonth(data['month']);
             client(data['output'],data['payment'],clientData,data['month'])});
     }
@@ -63,45 +63,6 @@ export default function ClientDetails(){
 
     return (
         <div className='p-1'>
-            {clientDataTable(clientData,total,t)}
-           {clientTable(componentRef,month,setMonth,handleSubmit,t)}
-        </div>
-    );
-}
-
-function clientDataTable(clientData,total,t){
-    return (
-        <>
-            <img class="mb-3" src={`http://127.0.0.1:8000/storage/storeClient/image/${clientData.image}`} alt='لا يوجد صوره لعرضها' height="100px"/>
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered table-hover" id="shopTable">
-                    <thead>
-                        <tr>
-                            <th>{t("id")}</th>
-                            <th>{t("client name")}</th>
-                            <th>{t("phone")}</th>
-                            <th>{t("amount")}</th>
-                            <th>{t("edit")}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{clientData.client_id}</td>
-                            <td>{clientData.client_name}</td>
-                            <td>{clientData.phone}</td>
-                            <td>{total.toFixed(2)}</td>
-                            <td><Link to="/client/edit" state={{ data: clientData }} type="button" class="btn btn-success" style={{height: "auto"}}>{t("edit")}</Link></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </>
-    );
-}
-
-function clientTable(componentRef,month,setMonth,handleSubmit,t){
-    return (
-        <>
             <div class="d-flex justify-content-between mb-2" style={{alignItems:"center"}}>
                 <ReactToPrint
                     trigger={() => {
@@ -116,7 +77,48 @@ function clientTable(componentRef,month,setMonth,handleSubmit,t){
                     </form>
                 </div>
             </div>
-            <div class="table-responsive" ref={(el) => (componentRef = el)}>
+            <img class="mb-3" src={`http://127.0.0.1:8000/storage/storeClient/image/${clientData.image}`} alt='لا يوجد صوره لعرضها' height="100px"/>
+            <div ref={(el) => (componentRef = el)}>
+                {clientDataTable(clientData,total,t)}
+                {clientTable(componentRef,month,setMonth,handleSubmit,t)}
+            </div>
+        </div>
+    );
+}
+
+function clientDataTable(clientData,total,t){
+    return (
+        <>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover" id="shopTable">
+                    <thead>
+                        <tr>
+                            <th>{t("id")}</th>
+                            <th>{t("client name")}</th>
+                            <th>{t("phone")}</th>
+                            <th>{t("amount due")}</th>
+                            <th>{t("edit")}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{clientData.client_id}</td>
+                            <td>{clientData.client_name}</td>
+                            <td>{clientData.phone}</td>
+                            <td>{total}</td>
+                            <td><Link to="/client/edit" state={{ data: clientData }} type="button" class="btn btn-success" style={{height: "auto"}}>{t("edit")}</Link></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </>
+    );
+}
+
+function clientTable(componentRef,month,setMonth,handleSubmit,t){
+    return (
+        <>
+            <div class="table-responsive">
                 <table class="table table-striped table-bordered table-hover" id="shopTable">
                     <thead>
                         <tr>
@@ -124,6 +126,8 @@ function clientTable(componentRef,month,setMonth,handleSubmit,t){
                             <th>{t("goods value")}</th>
                             <th>{t("goods quantity")}</th>
                             <th>{t("payments")}</th>
+                            <th>{t("description")}</th>
+                            <th>{t("payment method")}</th>
                         </tr>
                     </thead>
                     <tbody>   
@@ -135,6 +139,8 @@ function clientTable(componentRef,month,setMonth,handleSubmit,t){
                                         <td>{item.goodsValue}</td>
                                         <td>{item.goodsQuantity}</td>
                                         <td>{item.payment}</td>
+                                        <td>{item.description}</td>
+                                        <td>{item.paymentMethod}</td>
                                     </tr>
                                 );
                             })
@@ -146,6 +152,7 @@ function clientTable(componentRef,month,setMonth,handleSubmit,t){
                             <th>{totalGoodsValue.toFixed(2)}</th>
                             <th>{totalGoodsQuantity}</th>
                             <th>{totalPayment.toFixed(2)}</th>
+                            
                         </tr>
                     </tfoot>
                 </table>
@@ -159,6 +166,8 @@ function client(outputs,payments,clientData,month){
     let goodsValue=0;
     let goodsQuantity=0;
     let payment=0;
+    let description='';
+    let paymentMethod='';
     totalGoodsValue=0;
     totalGoodsQuantity=0;
     totalPayment=0;
@@ -167,7 +176,7 @@ function client(outputs,payments,clientData,month){
         day=`${month}-${i<10 ? `0${i}` : i}`;
         outputs.map((item,index) => {
             if (item.day == `${i<10 ? `0${i}` : i}`) {
-                goodsValue += item.value;
+                goodsValue+= item.value;
                 totalGoodsValue+=item.value;
                 goodsQuantity+=item.quantity;
                 totalGoodsQuantity+=item.quantity;
@@ -177,6 +186,8 @@ function client(outputs,payments,clientData,month){
             if (item.day == `${i<10 ? `0${i}` : i}`) {
                 payment += item.amount;
                 totalPayment+=item.amount;
+                description=item.description;
+                paymentMethod=item.payment_method;
             }
         })
 
@@ -185,6 +196,8 @@ function client(outputs,payments,clientData,month){
             'goodsValue':goodsValue,
             'goodsQuantity':goodsQuantity,
             'payment':payment,
+            'description':description,
+            'paymentMethod':paymentMethod,
             'totalGoodsValue':totalGoodsValue,
             'totalGoodsQuantity':totalGoodsQuantity,
             'totalPayment':totalPayment
@@ -193,6 +206,8 @@ function client(outputs,payments,clientData,month){
         goodsValue=0;
         goodsQuantity=0;
         payment=0;
+        description='';
+        paymentMethod='';
 
     }
 

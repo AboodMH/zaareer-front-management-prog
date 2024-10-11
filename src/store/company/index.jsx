@@ -50,6 +50,10 @@ export default function Company(){
                                         <h6>{t("phone")}:</h6>
                                         <p>{item.company_phone}</p>
                                     </div>
+                                    <div className="d-flex justify-content-between">
+                                        <h6>{t("discount")}:</h6>
+                                        <p>{item.discount}</p>
+                                    </div>
                                 </div>
                             </div>
                         </Link>

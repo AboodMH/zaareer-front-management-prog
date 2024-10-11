@@ -19,6 +19,7 @@ export default function EditCompany(){
     const [address, setAddress] = useState(companyData.company_address);
     const [phone, setPhone] = useState(companyData.company_phone);
     const [image, setImage] = useState("");
+    const [discount, setDiscount] = useState(companyData.discount);
 
     const changeHandler = (e)=>{
         setImage(e.target.files[0]);
@@ -32,6 +33,7 @@ export default function EditCompany(){
         formData.append('company_name', name);
         formData.append('company_address', address);
         formData.append('company_phone', phone);
+        formData.append('discount', discount);
         if (image!=='') {
             formData.append('image', image);
         }
@@ -65,6 +67,10 @@ export default function EditCompany(){
                 <div className="form-group mb-4">
                     <label for="phone">{t("phone")}</label>
                     <input onChange={(e)=>{setPhone(e.target.value)}} type="text" className="form-control" value={phone}/>
+                </div>
+                <div className="form-group mb-4">
+                    <label for="discount">{t("discount")}</label>
+                    <input onChange={(e)=>{setDiscount(e.target.value)}} type="number" step={0.0001} className="form-control" value={discount}/>
                 </div>
                <div className="form-group mb-4">
                     <label for="image">{t("image")}</label>

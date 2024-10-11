@@ -16,6 +16,8 @@ export default function CreateCompany(){
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
     const [image, setImage] = useState('');
+    const [discount, setDiscount] = useState(0);
+
 
     const changeHandler = (e)=>{
         setImage(e.target.files[0]);
@@ -28,6 +30,7 @@ export default function CreateCompany(){
         formData.append('company_name', name);
         formData.append('company_address', address);
         formData.append('company_phone', phone);
+        formData.append('discount', discount);
         if (image!=='') {
             formData.append('image', image);
         }
@@ -60,6 +63,10 @@ export default function CreateCompany(){
                 <div className="form-group mb-4">
                     <label for="phone">{t("phone")}</label>
                     <input onChange={(e)=>{setPhone(e.target.value)}} type="text" className="form-control" placeholder={t("enter")+" "+t("phone")}/>
+                </div>
+                <div className="form-group mb-4">
+                    <label for="discount">{t("discount")}</label>
+                    <input onChange={(e)=>{setDiscount(e.target.value)}} type="number" step={0.0001} className="form-control" placeholder={t("enter")+" "+t("discount")}/>
                 </div>
                <div className="form-group mb-4">
                     <label for="image">{t("image")}</label>

@@ -4,6 +4,9 @@ import * as React from 'react';
 import axios from "axios";
 import Modal from 'react-modal';
 import { useTranslation } from 'react-i18next';
+import ClipLoader from "react-spinners/ClipLoader";
+import CheckIcon from '@mui/icons-material/Check';
+
 
 let token=localStorage.getItem('token');
 
@@ -33,6 +36,13 @@ export default function InputDetails(){
     const [isSellPriceFillIsOpen,setIsSellPriceFillIsOpen] = useState(false);
     const [confirmDeleteIsOpen,setConfirmDeleteIsOpen] = useState([false,{}]);
     const [productId, setProductId] = useState(0);
+    const [searchProduct, setSearchProduct] = useState({});
+    const [inputFounded, setInputFounded] = useState({});
+    const [loadingIsOpen, setLoadingIsOpen] = useState(false);
+    const [reloadPageIsOpen,setReloadPageIsOpen] = useState(false);
+    const [isProductExist, setIsProductExist] = useState(false);
+
+
     const location = useLocation();
     const invoiceNo=location.state.data.invoice_no;
     const month=location.state.data.month;
@@ -52,17 +62,36 @@ export default function InputDetails(){
 
     const fetchTotalInput=async()=>{
         await axios.get(`http://127.0.0.1:8000/api/store/totalInput/${invoiceNo}`,config).then(({data})=>{
-            setInputData(data[0]);
-            console.log(data[0]);
+            setInputData(data);
+            console.log(data);
         });
     }
 
     const fetchProduct=async(productNo)=>{
         await axios.get(`http://127.0.0.1:8000/api/store/product/${productNo}`,config).then(({data})=>{
-            setProductId(data[0].id);
+            setProductId(data.id);
             console.log(data);
         });
     }
+
+    const fetchSearchProduct=async(productNo)=>{
+        await axios.get(`http://127.0.0.1:8000/api/store/product/${productNo}`,config).then(({data})=>{
+            setSearchProduct(data);
+            console.log(data);
+        });
+    }
+
+    const fetchInputFounded=async()=>{
+        await axios.get(`http://127.0.0.1:8000/api/store/input/${invoiceNo}`,config).then(({data})=>{
+            data.map((item,index)=>{
+                if(item.product_no===productNo){
+                    setInputFounded(item);
+                    console.log(item);
+                }
+            });
+        });
+    }
+    
 
     useEffect(() => {
         fetchThisInput();
@@ -71,11 +100,14 @@ export default function InputDetails(){
 
     return(
         <>
-            {addProduct(t,addProductIsOpen,setAddProductIsOpen,setIsAllFilledIsOpen,setAddSellPriceIsOpen,productNo,setProductNo,productName,setProductName,price,setPrice,cartoon,setCartoon,packing,setPacking,description,setDescription,image,setImage)}
-            {addSellPrice(inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setAddSellPriceIsOpen,setSellPrice,productNo,productName,price,sellPrice,cartoon,packing,description,image,navigate,t)}
+            {addProduct(t,fetchSearchProduct,addProductIsOpen,setAddProductIsOpen,setIsAllFilledIsOpen,setAddSellPriceIsOpen,productNo,setProductNo,productName,setProductName,price,setPrice,cartoon,setCartoon,packing,setPacking,description,setDescription,image,setImage)}
+            {addSellPrice(fetchInputFounded,setIsProductExist,setLoadingIsOpen,setReloadPageIsOpen,searchProduct,inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setAddSellPriceIsOpen,setSellPrice,productNo,productName,price,sellPrice,cartoon,packing,description,image,navigate,t)}
             {isAllFilled(t,isAllFilledIsOpen,setIsAllFilledIsOpen)}
             {isSellPriceFill(t,isSellPriceFillIsOpen,setIsSellPriceFillIsOpen)}
             {deleteConfirm(t,inputData,productId,confirmDeleteIsOpen,setConfirmDeleteIsOpen)}
+            {isProductExistPage(t,navigate,inputFounded,isProductExist,setIsProductExist,setLoadingIsOpen,setReloadPageIsOpen,searchProduct,inputData,productNo,productName,price,sellPrice,cartoon,packing,description,image)}
+            {loadingScreen(loadingIsOpen)}
+            {reloadPage(t,reloadPageIsOpen,setReloadPageIsOpen)}
             <div class="table-responsive p-1">
                 <div className="form-group mb-2">
                     <button onClick={()=>{setAddProductIsOpen(true)}} className="btn btn-success">{t("add product")}</button>
@@ -86,7 +118,7 @@ export default function InputDetails(){
                             <th colSpan={1}>{t("date")}</th>
                             <th colSpan={4}>{month}-{day}</th>
                             <th colSpan={1}>{t("invoice no")}</th>
-                            <th colSpan={4}>{invoiceNo}</th>
+                            <th colSpan={5}>{invoiceNo}</th>
                         </tr>
                         <tr>
                             <th>{t("product no")}</th>
@@ -125,15 +157,15 @@ export default function InputDetails(){
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colSpan={10}></th>
+                            <th colSpan={11}></th>
                         </tr>
                         <tr>
                             <th colSpan={1}>{t("total cartoon")}</th>
-                            <th colSpan={9}>{totalCartoon}</th>
+                            <th colSpan={10}>{totalCartoon}</th>
                         </tr>
                         <tr>
                             <th colSpan={1}>{t("final total")}</th>
-                            <th colSpan={9}>{total.toFixed(2)}</th>
+                            <th colSpan={10}>{total.toFixed(2)}</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -142,7 +174,7 @@ export default function InputDetails(){
     );
 }
 
-function addProduct(t,addProductIsOpen,setAddProductIsOpen,setIsAllFilledIsOpen,setAddSellPriceIsOpen,productNo,setProductNo,productName,setProductName,price,setPrice,cartoon,setCartoon,packing,setPacking,description,setDescription,image,setImage) {
+function addProduct(t,fetchSearchProduct,addProductIsOpen,setAddProductIsOpen,setIsAllFilledIsOpen,setAddSellPriceIsOpen,productNo,setProductNo,productName,setProductName,price,setPrice,cartoon,setCartoon,packing,setPacking,description,setDescription,image,setImage) {
     const changeHandler = (e)=>{
         e.preventDefault();
         setImage(e.target.files[0]);
@@ -169,7 +201,7 @@ function addProduct(t,addProductIsOpen,setAddProductIsOpen,setIsAllFilledIsOpen,
           <div className='col'>
                 <div className="form-group mb-4">
                     <label for="product no">{t("product no")}</label>
-                    <input onChange={(e)=>{setProductNo(e.target.value)}} type="text" className="form-control" placeholder={t("Enter product no")}/>
+                    <input onChange={(e)=>{setProductNo(e.target.value)}}  type="text" className="form-control" placeholder={t("Enter product no")}/>
                 </div>
                 <div className="form-group mb-4">
                     <label for="product name">{t("product name")}</label>
@@ -197,7 +229,7 @@ function addProduct(t,addProductIsOpen,setAddProductIsOpen,setIsAllFilledIsOpen,
                  </div>
                 <div style={{textAlign:"center"}} className="d-flex justify-content-between">
                     <div className="d-flex justify-content-start"> 
-                        <button onClick={()=>{productNo==='' || productName==='' || price==='' || packing==='' || cartoon==='' || description==='' ? setIsAllFilledIsOpen(true) : setAddSellPriceIsOpen(true)}} className="btn btn-outline-success mx-4">{t("create")}</button>
+                        <button onClick={()=>{productNo==='' || productName==='' || price==='' || packing==='' || cartoon==='' || description==='' ? setIsAllFilledIsOpen(true) : setAddSellPriceIsOpen(true); fetchSearchProduct(productNo)}} className="btn btn-outline-success mx-4">{t("create")}</button>
                     </div>
                 </div>
           </div>
@@ -234,36 +266,9 @@ function isAllFilled(t,isAllFilledIsOpen,setIsAllFilledIsOpen) {
     );
 }
 
-function addSellPrice(inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setAddSellPriceIsOpen,setSellPrice,productNo,productName,price,sellPrice,cartoon,packing,description,image,navigate,t){
-    const createInput = async(e)=>{
-        const formDataInput = new FormData();
-        formDataInput.append('date', `${inputData.month}-${inputData.day}`);
-        formDataInput.append('company_name', inputData.company_name);
-        formDataInput.append('product_no', productNo);
-        formDataInput.append('product_name', productName);
-        formDataInput.append('invoice_no', inputData.invoice_no);
-        formDataInput.append('price', price);
-        formDataInput.append('cartoon', cartoon);
-        formDataInput.append('packing', packing);
-        formDataInput.append('description', description);
-        if (Image!=='') {
-            formDataInput.append('image', image);
-        }
-
-        await axios.post('http://127.0.0.1:8000/api/store/input', formDataInput,config)
-        .then(({data})=>{
-            console.log(data.message);
-            window.location.reload();
-        }).catch(({response})=>{
-            if (response.status ==422) {
-                console.log(response.data.errors)
-            } else {
-                console.log(response.data.message)
-            }
-        });
-    }
+function addSellPrice(fetchInputFounded,setIsProductExist,setLoadingIsOpen,setReloadPageIsOpen,searchProduct,inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setAddSellPriceIsOpen,setSellPrice,productNo,productName,price,sellPrice,cartoon,packing,description,image,navigate,t){
     
-    const create = async(e)=>{
+    const createProduct = async(e)=>{
         const formDataProduct = new FormData();
         formDataProduct.append('date', `${inputData.month}-${inputData.day}`);
         formDataProduct.append('company_name', inputData.company_name);
@@ -293,6 +298,33 @@ function addSellPrice(inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setA
         });
     }
 
+    const createInput = async(e)=>{
+        const formDataInput = new FormData();
+        formDataInput.append('date', `${inputData.month}-${inputData.day}`);
+        formDataInput.append('company_name', inputData.company_name);
+        formDataInput.append('product_no', productNo);
+        formDataInput.append('product_name', productName);
+        formDataInput.append('invoice_no', inputData.invoice_no);
+        formDataInput.append('price', price);
+        formDataInput.append('cartoon', cartoon);
+        formDataInput.append('packing', packing);
+        formDataInput.append('description', description);
+        if (Image!=='') {
+            formDataInput.append('image', image);
+        }
+
+        await axios.post('http://127.0.0.1:8000/api/store/input', formDataInput,config)
+        .then(({data})=>{
+            console.log(data.message);
+        }).catch(({response})=>{
+            if (response.status ==422) {
+                console.log(response.data.errors)
+            } else {
+                console.log(response.data.message)
+            }
+        });
+    }
+
     const updateTotalInput=async(e)=>{
         const formDataTotalInput=new FormData();
         formDataTotalInput.append('_method', 'PATCH');
@@ -305,6 +337,8 @@ function addSellPrice(inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setA
 
         await axios.post(`http://127.0.0.1:8000/api/store/totalInput/${inputData.id}`,formDataTotalInput,config).then(({data})=>{
             console.log(data.message);
+            setLoadingIsOpen(false);
+            setReloadPageIsOpen(true);
         }).catch(({response})=>{
             if (response.status ==422) {
                 console.log(response.data.errors)
@@ -312,6 +346,20 @@ function addSellPrice(inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setA
                 console.log(response.data.message)
             }
         });
+    }
+
+
+    const createAll=()=>{
+        fetchInputFounded();
+        if (searchProduct.product_no===productNo) {
+            setIsProductExist(true);
+        }else{
+            setLoadingIsOpen(true);
+            createProduct();
+            createInput();
+            updateTotalInput();
+        }
+        
     }
 
     return(
@@ -337,7 +385,7 @@ function addSellPrice(inputData,setIsSellPriceFillIsOpen,addSellPriceIsOpen,setA
                         <div className="col-sm-10 mb-4">
                             <input type="number" step={0.01} className="form-control" placeholder={t("value")} onChange={(e)=>{setSellPrice(e.target.value)}}/>
                         </div>
-                        <button onClick={()=>{sellPrice===0 ? setIsSellPriceFillIsOpen(true) : createInput();sellPrice===0 ? setIsSellPriceFillIsOpen(true) :updateTotalInput();sellPrice===0 ? setIsSellPriceFillIsOpen(true) :create()}} className="btn btn-success" style={{width:"70%",marginTop:"30px"}}>{t("confirm")}</button>
+                        <button onClick={()=>{sellPrice===0 ? setIsSellPriceFillIsOpen(true) : createAll()}} className="btn btn-success" style={{width:"70%",marginTop:"30px"}}>{t("confirm")}</button>
                     </div>
             </div>
         </Modal>
@@ -449,3 +497,231 @@ function deleteConfirm(t,inputData,productId,confirmDeleteIsOpen,setConfirmDelet
     );
 }
 
+function isProductExistPage(t,navigate,inputFounded,isProductExist,setIsProductExist,setLoadingIsOpen,setReloadPageIsOpen,searchProduct,inputData,productNo,productName,price,sellPrice,cartoon,packing,description,image) {
+    
+    const updateInput=async(e)=>{
+        const formDataInput = new FormData();
+        formDataInput.append('_method', 'PATCH');
+        formDataInput.append('date', `${inputFounded.month}-${inputFounded.day}`);
+        formDataInput.append('company_name', inputFounded.company_name);
+        formDataInput.append('product_no', inputFounded.product_no);
+        formDataInput.append('product_name', inputFounded.product_name);
+        formDataInput.append('invoice_no', inputFounded.invoice_no);
+        formDataInput.append('price', inputFounded.price);
+        formDataInput.append('cartoon', parseInt(inputFounded.cartoon)+parseInt(cartoon));
+        formDataInput.append('packing', inputFounded.packing);
+        formDataInput.append('description', inputFounded.description);
+        if (inputFounded.image!=='') {
+            formDataInput.append('image', inputFounded.image);
+        }
+
+        await axios.post(`http://127.0.0.1:8000/api/store/input/${inputFounded.id}`, formDataInput,config)
+        .then(({data})=>{
+            console.log(data.message);
+        }).catch(({response})=>{
+            if (response.status ==422) {
+                console.log(response.data.errors)
+            } else {
+                console.log(response.data.message)
+            }
+        });
+    }
+
+    const createInput=async(e)=>{
+        const formDataInput = new FormData();
+        formDataInput.append('date', `${inputData.month}-${inputData.day}`);
+        formDataInput.append('company_name', searchProduct.company_name);
+        formDataInput.append('product_no', searchProduct.product_no);
+        formDataInput.append('product_name', searchProduct.product_name);
+        formDataInput.append('invoice_no', inputData.invoice_no);
+        formDataInput.append('price', searchProduct.buy_price);
+        formDataInput.append('cartoon', cartoon);
+        formDataInput.append('packing', searchProduct.packing);
+        formDataInput.append('description', searchProduct.description);
+        if (searchProduct.image!=='') {
+            formDataInput.append('image', searchProduct.image);
+        }
+
+        await axios.post(`http://127.0.0.1:8000/api/store/input`, formDataInput,config)
+        .then(({data})=>{
+            console.log(data.message);
+        }).catch(({response})=>{
+            if (response.status ==422) {
+                console.log(response.data.errors)
+            } else {
+                console.log(response.data.message)
+            }
+        });
+    }
+
+    const updateTotalInput=async(e)=>{
+        const formDataTotalInput=new FormData();
+        formDataTotalInput.append('_method', 'PATCH');
+        formDataTotalInput.append('date',`${inputData.month}-${inputData.day}`);
+        formDataTotalInput.append('company_name',searchProduct.company_name);
+        formDataTotalInput.append('invoice_no',inputData.invoice_no);
+        formDataTotalInput.append('description',searchProduct.description);
+        formDataTotalInput.append('value',inputData.value+(searchProduct.buy_price*searchProduct.packing*cartoon));
+        formDataTotalInput.append('quantity',parseFloat(inputData.quantity)+parseFloat(cartoon));
+
+        await axios.post(`http://127.0.0.1:8000/api/store/totalInput/${inputData.id}`,formDataTotalInput,config).then(({data})=>{
+            console.log(data.message);
+        }).catch(({response})=>{
+            if (response.status ==422) {
+                console.log(response.data.errors)
+            } else {
+                console.log(response.data.message)
+            }
+        });
+    }
+
+    const updateQNT=async(e)=>{
+        const formEditQNT = new FormData();
+        formEditQNT.append('product_no', productNo);
+        formEditQNT.append('cartoon', -cartoon);
+
+        await axios.post(`http://127.0.0.1:8000/api/store/product/updateQNT`,formEditQNT,config).then(({ data }) => {
+            console.log(data);
+            setLoadingIsOpen(false);
+            setReloadPageIsOpen(true);
+        }).catch(({response})=>{
+            if (response.status ==422) {
+                console.log(response.data.errors)
+            } else {
+                console.log(response.data.message)
+            }
+        });
+    }
+
+    const createAll=()=>{
+        setLoadingIsOpen(true);
+        if (Object.keys(inputFounded).length!==0) {
+            updateInput();
+        }else{
+            createInput();
+        }
+        updateTotalInput();
+        updateQNT();
+    }
+
+
+    return(
+        <>
+        <Modal
+          isOpen={isProductExist}
+          style={{
+            overlay:{
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            },
+            content:{
+                marginLeft:"22vw",
+                alignSelf:"center",
+                width:"50vw",
+                height:"70vh",
+            }
+        }}
+        >
+            <div className='col justify-content-between'>
+                <h3 className='row' style={{display:"flex",justifyContent:"center",marginBottom:"10px",color:"green"}}>{t("This product was found in the store.Do you Want to increase the quantity?")}</h3>
+                <div className='col'>
+                    <div className="form-group mb-4">
+                        <label for="product no">{t("product no")}</label>
+                        <input type="text" className="form-control" value={searchProduct.product_no}/>
+                    </div>
+                    <div className="form-group mb-4">
+                        <label for="product name">{t("product name")}</label>
+                        <input type="text" className="form-control" value={searchProduct.product_name}/>
+                    </div>
+                    <div className="form-group mb-4">
+                        <label for="sell price">{t("sell price")}</label>
+                        <input type="number" step={0.01} className="form-control" value={searchProduct.sell_price}/>
+                    </div>
+                    <div className="form-group mb-4">
+                        <label for="buy price">{t("buy price")}</label>
+                        <input type="number" step={0.01} className="form-control" value={searchProduct.buy_price}/>
+                    </div>
+                    <div className="form-group mb-4">
+                        <label for="packing">{t("packing")}</label>
+                        <input type="number" className="form-control" value={searchProduct.packing}/>
+                    </div>
+                    <div className="form-group mb-4">
+                        <label for="cartoon">{t("cartoon")}</label>
+                        <input type="number" className="form-control" value={searchProduct.cartoon}/>
+                    </div>
+                    <div className="form-group mb-4">
+                        <label for="description">{t("description")}</label>
+                        <input type="text" className="form-control" value={searchProduct.description}/>
+                    </div>
+                    <div style={{textAlign:"center"}} className="d-flex justify-content-between">
+                        <div className="d-flex justify-content-start"> 
+                            <button onClick={()=>{createAll()}} className="btn btn-outline-success mx-4">{t("create")}</button>
+                            <button onClick={()=>{window.location.reload()}} className="btn btn-outline-danger mx-4">{t("cancel")}</button>
+                        </div>
+                    </div>
+            </div>
+          </div>
+        </Modal>
+      </>
+    );
+}
+
+function loadingScreen(loadingIsOpen) {
+    return (
+      <div className="sweet-loading">
+        <Modal
+            isOpen={loadingIsOpen}
+            style={{
+                content:{
+                    marginLeft:"22vw",
+                    alignSelf:"center",
+                    alignContent:"center",
+                    width:"50vw",
+                    height:"50vh",
+                    border:"none",
+                }
+            }}
+          >
+            <div style={{display:"flex",justifyContent:"center"}}>
+                <ClipLoader
+                    color={"#000000"}
+                    loading={loadingIsOpen}
+                    size={150}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                />
+            </div>
+        </Modal>
+      </div>
+    );
+}
+
+function reloadPage(t,reloadPageIsOpen,setReloadPageIsOpen) {
+    return(
+        <>
+        <Modal
+          isOpen={reloadPageIsOpen}
+          style={{
+            overlay:{
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            },
+            content:{
+                marginLeft:"22vw",
+                alignSelf:"center",
+                width:"50vw",
+                height:"50vh",
+            }
+        }}
+        >
+            <div className='col justify-content-between'>
+                <h3 className='row' style={{display:"flex",justifyContent:"center",marginBottom:"10px",color:"green"}}>{t("The product has been added successfully.")}</h3>
+                <div style={{display:"flex",justifyContent:"center", color:"green", fontSize:"100px"}}>
+                    <CheckIcon style={{fontSize:"200px"}}/>
+                </div>
+                <div className='row' style={{paddingLeft:"150px",paddingRight:"150px"}}>
+                    <button onClick={()=>{window.location.reload();}} className='btn btn-success m-2'>{t("ok")}</button>
+                </div>
+          </div>
+        </Modal>
+      </>
+    );
+}
